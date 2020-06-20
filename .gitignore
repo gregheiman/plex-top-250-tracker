@@ -4,3 +4,6 @@
 *target/
 APIKeys.txt
 *.idea/
+.project
+.classpath
+*.settings/
