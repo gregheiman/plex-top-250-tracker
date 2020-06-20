@@ -1,0 +1,6 @@
+*.vim
+*.swp
+*.iml
+*target/
+APIKeys.txt
+*.idea/
