@@ -8,6 +8,12 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
+
+/**
+ * Class scrapes the IMDB top 250 movie titles and adds them to ArrayLists which are then used to search through and
+ * verify the existence of said movie in the Plex library.
+ * @author Greg Heiman
+ */
 public class ScrapeIMDBMovieNames {
     private static ArrayList<String> movieTitlesWithSpaceIdentifiers = new ArrayList<String>();
     private static ArrayList<String> movieTitlesWithSpaces = new ArrayList<String>();
@@ -24,6 +30,10 @@ public class ScrapeIMDBMovieNames {
         return movieTitlesWithSpaces;
     }
 
+    /**
+     * Scrapes the IMDB top 250 web page and adds the names of the movies to an ArrayList that will be used for
+     * creating Plex URL's to search through the Plex library.
+     */
     public static void SetMovieTitlesArrayListsFromIMDB() {
         Document IMDBTop250 = null;
 
@@ -54,6 +64,12 @@ public class ScrapeIMDBMovieNames {
         }
     }
 
+    /**
+     * Filters out the number before to movie title and the year after the movie title leaving only the movies name
+     * @param title - The title of the movie we are filtering
+     * @return - just the name of the movie to add to the movieTitlesWithSpaceIdentifiers and movieTitlesWithSpaces
+     *  ArrayLists
+     */
     private static String filterIMDBTitles(String title) {
         String filteredTitle;
 

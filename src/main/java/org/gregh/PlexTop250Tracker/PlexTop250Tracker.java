@@ -5,6 +5,9 @@ public class PlexTop250Tracker {
         ScrapeIMDBMovieNames IMDBScraper = new ScrapeIMDBMovieNames();
         GrabAllMovieNamesInPlex PlexAPIHitter = new GrabAllMovieNamesInPlex();
 
+        // Crosscheck the IMDB list with the Plex library
         PlexAPIHitter.createNewPlexURLWithMovieTitle(IMDBScraper.getMovieTitles());
+        // Print out the movies that are missing from the Plex library
+        PlexAPIHitter.sendNeededMoviesToFile(PlexAPIHitter.getListOfNeededMovies());
     }
 }
