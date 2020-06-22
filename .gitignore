@@ -8,3 +8,4 @@ APIKeys.txt
 .classpath
 *.settings/
 neededMovies.txt
+*.xlsx

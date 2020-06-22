@@ -12,5 +12,9 @@ public class PlexTop250Tracker {
         PlexAPIHitter.sendNeededMoviesToFile(PlexAPIHitter.getListOfNeededMovies());
         // Add the movies to an Excel spreadsheet
         excelSheet.writeMissingMoviesToSpreadsheet(PlexAPIHitter.getListOfNeededMovies());
+
+        // Send the newly created excel sheet to the users chosen email address
+        EmailExcelToUser emailExcelToUser = new EmailExcelToUser(excelSheet);
+        emailExcelToUser.askUserForSenderEmail();
     }
 }

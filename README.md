@@ -49,4 +49,8 @@ to install the Maven packages:
     ```
     mvn clean compile exec:java
     ```
+   
+9. If you would like to email the automatically created excel sheet to yourself or someone else
+you must have a Gmail account and either allow less secure sign ins through the security panel, or
+if you have 2-Factor authentication you need to create an app password to use with this program.
 

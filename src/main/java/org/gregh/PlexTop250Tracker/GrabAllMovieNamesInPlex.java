@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -82,12 +83,15 @@ public class GrabAllMovieNamesInPlex {
             }
 
             in.close();
+        } catch (ConnectException e) {
+            System.out.println("The connection to the Plex server timed out. Make sure that the Plex server is on and " +
+                    "running on the correct IP and Port number");
+            e.printStackTrace();
         } catch (IOException e) {
-           System.out.println("Something happened in verifying the existence of the following movie: " + titleOfMovie +
-           " using the following URL: " + finalPlexURL);
-           e.printStackTrace();
+            System.out.println("Something happened in verifying the existence of " + titleOfMovie +
+                    " using the following URL: " + finalPlexURL);
+            e.printStackTrace();
         }
-
     }
 
     /**
