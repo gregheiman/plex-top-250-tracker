@@ -10,6 +10,10 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+/**
+ * Writes the missing movie names to an excel file
+ * @author Greg Heiman
+ */
 public class WriteMovieTitlesToExcel {
     private XSSFWorkbook workbook;
     private FileOutputStream fileOut;
@@ -35,7 +39,19 @@ public class WriteMovieTitlesToExcel {
         this.fileOut = fileOut;
     }
 
+    public String getFileOutName() {
+        return fileOutName;
+    }
 
+    public void setFileOutName(String fileOutName) {
+        this.fileOutName = fileOutName;
+    }
+
+    /**
+     * Set the style for the movie name cells
+     * @param workbook - the workbook that is currently being used
+     * @return - the newly set up cell style
+     */
     private CellStyle setSpreadsheetCellStyle(XSSFWorkbook workbook) {
         // Create a font for the rest of the spreadsheet
         Font spreadsheetFont = workbook.createFont();
@@ -48,6 +64,11 @@ public class WriteMovieTitlesToExcel {
         return spreadsheetCellStyle;
     }
 
+    /**
+     * Set the style for the hyperlink cells
+     * @param workbook - the workbook that is currently being used
+     * @return - the newly set up cell style
+     */
     private CellStyle setHyperlinkStyle(XSSFWorkbook workbook) {
         // Create a font for the hyperlinks so that they look like hyperlinks
         Font hyperlinkFont = workbook.createFont();
@@ -61,6 +82,11 @@ public class WriteMovieTitlesToExcel {
         return hyperlinkStyle;
     }
 
+    /**
+     *  Set the header row with the needed information and style
+     * @param workbook - the current workbook that is being used
+     * @param sheet - the current sheet that is being used
+     */
     private static void setHeaderRow(XSSFWorkbook workbook, Sheet sheet) {
         // Set the font for the header row
         Font headerFont = workbook.createFont();
@@ -89,10 +115,15 @@ public class WriteMovieTitlesToExcel {
         dateCell.setCellStyle(headerCellStyle);
     }
 
+    /**
+     * Write the movie names from the missing movie array list to the spreadsheet
+     * @param missingMovieNames - The arraylist containing the names of the missing movies
+     */
     public void writeMissingMoviesToSpreadsheet(ArrayList<String> missingMovieNames) {
         // Needed in order to allow for the easy creation of hyperlinks
         CreationHelper createHelper = workbook.getCreationHelper();
 
+        // Set the name of the spreadsheet
         try {
             setFileOutName(LocalDateTime.now() + "-Missing Movies.xlsx");
             setFileOut(new FileOutputStream(getFileOutName()));
@@ -151,13 +182,5 @@ public class WriteMovieTitlesToExcel {
             System.out.println("There was a problem closing the workbook or the FileOutputStream");
             e.printStackTrace();
         }
-    }
-
-    public String getFileOutName() {
-        return fileOutName;
-    }
-
-    public void setFileOutName(String fileOutName) {
-        this.fileOutName = fileOutName;
     }
 }

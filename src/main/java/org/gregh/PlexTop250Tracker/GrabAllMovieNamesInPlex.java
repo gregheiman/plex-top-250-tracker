@@ -61,7 +61,11 @@ public class GrabAllMovieNamesInPlex {
     }
 
     public void setPlexPort(String plexPort) {
-        this.plexPort = plexPort;
+        if (verifyPortNum(plexPort)) {
+            this.plexPort = plexPort;
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     public String getPlexLibraryNum() {
@@ -69,7 +73,11 @@ public class GrabAllMovieNamesInPlex {
     }
 
     public void setPlexLibraryNum(String plexLibraryNum) {
-        this.plexLibraryNum = plexLibraryNum;
+        if (verifyPlexLibraryNum(plexLibraryNum)) {
+            this.plexLibraryNum = plexLibraryNum;
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     public String getPlexAuthToken() {
@@ -77,7 +85,11 @@ public class GrabAllMovieNamesInPlex {
     }
 
     public void setPlexAuthToken(String plexAuthToken) {
-        this.plexAuthToken = plexAuthToken;
+        if (verifyPlexAuthToken(plexAuthToken)) {
+            this.plexAuthToken = plexAuthToken;
+        } else {
+           throw new IllegalArgumentException();
+        }
     }
 
     public URL getPlexBaseURL() {
@@ -85,16 +97,57 @@ public class GrabAllMovieNamesInPlex {
     }
 
     /**
-     * Uses regex to verify that then entered IP address is valid
+     * Uses regex to verify that user's entered ip address is valid
      * @param ipAddress - The IP address the user inputted
      * @return - boolean of whether the ip address is valid or not
      */
     private boolean verifyIPAddress(String ipAddress) {
+        if (ipAddress.isEmpty() || ipAddress.isBlank()) {
+            return false;
+        }
+
         String pattern = "^((0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)\\.){3}(0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)$";
 
         return ipAddress.matches(pattern);
     }
 
+    /**
+     * Uses regex to verify the users entered port number
+     * @param portNumber - The port number that the user entered
+     * @return - boolean of whether the port number is valid or not
+     */
+    private boolean verifyPortNum(String portNumber) {
+        if (portNumber.isBlank() || portNumber.isEmpty()) {
+            return false;
+        }
+
+        // Checks that the users has entered in no more than 5 digits
+        String pattern = "^\\d{1,5}$";
+
+        return portNumber.matches(pattern) && Integer.parseInt(portNumber) < 65535;
+    }
+
+    private boolean verifyPlexAuthToken(String plexAuthToken) {
+        if (plexAuthToken.isEmpty() || plexAuthToken.isBlank()) {
+            return false;
+        }
+
+        // plexAuthToken must be 20 characters long
+        String pattern = "^\\w{20}$";
+
+        return plexAuthToken.matches(pattern);
+    }
+
+    private boolean verifyPlexLibraryNum(String libraryNum) {
+        // Checks that the user entered in digits
+        String pattern = "^\\d$";
+
+        if (libraryNum.isBlank() || libraryNum.isEmpty()) {
+            return false;
+        }
+
+        return libraryNum.matches(pattern);
+    }
     /**
      * Take in the users answers in order to form a complete base URL for their Plex server
      */
@@ -112,14 +165,37 @@ public class GrabAllMovieNamesInPlex {
             }
         }
 
-        System.out.println("What is the port number that your local Plex server runs on?");
-        setPlexPort(input.nextLine());
+        // Take in the user's Plex port number
+        while (true) {
+            try {
+                System.out.println("What is the port number that your local Plex server runs on?");
+                setPlexPort(input.nextLine());
+                break;
+            } catch (IllegalArgumentException e) {
+               System.out.println("Please enter in a valid port number");
+            }
+        }
 
-        System.out.println("What is the key of the libaray in which you store movies?");
-        setPlexLibraryNum(input.nextLine());
+        // Take in the user's Plex library
+        while (true) {
+           try {
+               System.out.println("What is the key of the library in which you store movies?");
+               setPlexLibraryNum(input.nextLine());
+               break;
+           } catch (IllegalArgumentException e) {
+               System.out.println("Please enter in a valid library number");
+           }
+        }
 
-        System.out.println("What is the auth token for your local Plex server?");
-        setPlexAuthToken(input.nextLine());
+        while (true) {
+           try {
+               System.out.println("What is the auth token for your local Plex server?");
+               setPlexAuthToken(input.nextLine());
+               break;
+           } catch (IllegalArgumentException e) {
+               System.out.println("Please enter in a valid Plex auth token");
+           }
+        }
 
         try {
             plexBaseURL = new URL("http://" + getPlexIP() + ":" + getPlexPort() + "/library/sections/" + getPlexLibraryNum()
@@ -172,10 +248,12 @@ public class GrabAllMovieNamesInPlex {
         } catch (ConnectException e) {
             System.out.println("The connection to the Plex server timed out. Make sure that the Plex server is on and " +
                     "running on the correct IP and Port number");
+            System.out.println("Entered in IP address:" + getPlexIP() + "\nEntered in Port number:" + getPlexPort());
             e.printStackTrace();
         } catch (IOException e) {
             System.out.println("Something happened in verifying the existence of " + titleOfMovie +
                     " using the following URL: " + finalPlexURL);
+            System.out.println("Entered in IP address:" + getPlexIP() + "\nEntered in Port number:" + getPlexPort());
             e.printStackTrace();
         }
     }
