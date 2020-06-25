@@ -14,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Uses the ArrayLists from ScrapeIMDBMovieNames and the Plex API to search through the Plex library to determine the
@@ -24,16 +25,13 @@ public class GrabAllMovieNamesInPlex {
     //TODO: Create a logging system that tracks what URL's were used, what movies we already have, and what movies we
     // need to get
     private URL plexBaseURL;
+    private String plexIP;
+    private String plexPort;
+    private String plexLibraryNum;
+    private String plexAuthToken;
     private ArrayList<String> listOfNeededMovies;
 
     public GrabAllMovieNamesInPlex() {
-        try {
-            plexBaseURL = new URL("http://192.168.9.160:32400/library/sections/4/all?X-Plex-Token=J8mb7J2wqBVvVKq5a2Ue");
-        } catch (MalformedURLException e) {
-            System.out.println("There was an error in creating the base URL for the Plex");
-            e.printStackTrace();
-        }
-
         listOfNeededMovies = new ArrayList<String>();
     }
 
@@ -41,14 +39,104 @@ public class GrabAllMovieNamesInPlex {
         return listOfNeededMovies;
     }
 
+    public void setListOfNeededMovies(ArrayList<String> listOfNeededMovies) {
+        this.listOfNeededMovies = listOfNeededMovies;
+    }
+
+    //TODO: Add verification for each of the following items
+    public String getPlexIP() {
+        return plexIP;
+    }
+
+    public void setPlexIP(String plexIP) {
+        if (verifyIPAddress(plexIP)) {
+            this.plexIP = plexIP;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public String getPlexPort() {
+        return plexPort;
+    }
+
+    public void setPlexPort(String plexPort) {
+        this.plexPort = plexPort;
+    }
+
+    public String getPlexLibraryNum() {
+        return plexLibraryNum;
+    }
+
+    public void setPlexLibraryNum(String plexLibraryNum) {
+        this.plexLibraryNum = plexLibraryNum;
+    }
+
+    public String getPlexAuthToken() {
+        return plexAuthToken;
+    }
+
+    public void setPlexAuthToken(String plexAuthToken) {
+        this.plexAuthToken = plexAuthToken;
+    }
+
+    public URL getPlexBaseURL() {
+        return plexBaseURL;
+    }
+
+    /**
+     * Uses regex to verify that then entered IP address is valid
+     * @param ipAddress - The IP address the user inputted
+     * @return - boolean of whether the ip address is valid or not
+     */
+    private boolean verifyIPAddress(String ipAddress) {
+        String pattern = "^((0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)\\.){3}(0|1\\d?\\d?|2[0-4]?\\d?|25[0-5]?|[3-9]\\d?)$";
+
+        return ipAddress.matches(pattern);
+    }
+
+    /**
+     * Take in the users answers in order to form a complete base URL for their Plex server
+     */
+    public void setBasePlexURL() {
+        Scanner input = new Scanner(System.in);
+
+        // Take in the user's Plex IP address
+        while (true) {
+            try {
+                System.out.println("What is the IP address of your local Plex server?");
+                setPlexIP(input.nextLine());
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Please enter in a valid IP address");
+            }
+        }
+
+        System.out.println("What is the port number that your local Plex server runs on?");
+        setPlexPort(input.nextLine());
+
+        System.out.println("What is the key of the libaray in which you store movies?");
+        setPlexLibraryNum(input.nextLine());
+
+        System.out.println("What is the auth token for your local Plex server?");
+        setPlexAuthToken(input.nextLine());
+
+        try {
+            plexBaseURL = new URL("http://" + getPlexIP() + ":" + getPlexPort() + "/library/sections/" + getPlexLibraryNum()
+                    + "/all?X-Plex-Token=" + getPlexAuthToken());
+        } catch (MalformedURLException e) {
+            System.out.println("There was an error in creating the base URL for the Plex");
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Create the full URL needed to search Plex for the existence of a cetain title
      * @param IMDBMovies - The array list that houses the IMDB top 250
-     * @return - return the final URL as a string that will be converted to a URL when needed
      */
-    public String createNewPlexURLWithMovieTitle(ArrayList<String> IMDBMovies) {
+    public void createNewPlexURLWithMovieTitle(ArrayList<String> IMDBMovies) {
         for (int i = 0; i < IMDBMovies.size(); i++) {
-            String plexURLWithMovieName = (plexBaseURL + "&title=" + IMDBMovies.get(i));
+            String plexURLWithMovieName = (getPlexBaseURL() + "&title=" + IMDBMovies.get(i));
 
             try {
                 grabPlexMovieNames(plexURLWithMovieName.replace(" ", "%20"),
@@ -57,8 +145,6 @@ public class GrabAllMovieNamesInPlex {
                 e.printStackTrace();
             }
         }
-
-        return "Successfully created new Plex URL's with movies titles in place";
     }
 
     /**
