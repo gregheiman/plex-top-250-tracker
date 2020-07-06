@@ -9,7 +9,7 @@ where users have gathered information on how the API works.
 ## Requirements
 1. Java 11
 2. Maven
-3. A Plex Server set up, and know the servers IP address
+3. A Plex Server set up on the local network
 4. An understanding of how the Plex API works (recommended)
 
 ## Instructions on How to Run the Program
@@ -18,39 +18,29 @@ and more specifically how your personal Plex library is set up.**
 
 1. Clone the repository onto your local machine
 
-2. Figure out your personal Plex authentication token. To figure that out go 
-[here.](https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/)
+2. Navigate to the repositories local location
 
-3. Figure out what the IP address of your Plex server is and what port the server is running on (Typically port 32400)
-
-4. Figure out what the key of the library you want to check is
-    1. To do that run hit the following API endpoint:
-        ```
-        http://IP:PORT/libary/sections?X-Plex-Token=Token 
-        ```
-    2. Look through the results till you find the right library and copy down the "key="
-    number under the <Directory> tag.
+3. You have two options for obtaining the needed information in order to access your Plex server. You can either do the automatic way which just needs your Plex login and Plex password, or if you have all the information already gathered you can use the manual way.
+    * The needed information is as follows: 
+        * the servers IP address
+        * the server's port number
+        * the Plex library's key
+        * your Plex authentication token
     
-5. Then go into GrabAllMovieNamesInPlex.java file and change the **plexBaseURL**
- under the constructor to the following URL:
-    ```
-    http://IP:PORT/libary/sections/key/all?X-Plex-Token=Token
-    ```
 
-6. Navigate to the repositories local location
-
-7. Run the following command inside of the repo's local location in order
+4. Run the following command inside of the repo's local location in order
 to install the Maven packages:
     ```
     mvn install
     ```
    
-8. Then run the following command in order to run the program:
+5. Then run the following command in order to run the program:
     ```
     mvn clean compile exec:java
     ```
    
-9. If you would like to email the automatically created excel sheet to yourself or someone else
+10. If you would like to email the automatically created excel sheet to yourself or someone else
 you must have a Gmail account and either allow less secure sign ins through the security panel, or
 if you have 2-Factor authentication you need to create an app password to use with this program.
+    * If you would not like to use Gmail or don't want to email the spreadsheet anywhere just end the program when you get to that point.
 
