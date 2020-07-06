@@ -2,6 +2,7 @@ package org.gregh.PlexTop250Tracker;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
@@ -132,14 +133,12 @@ public class FetchPlexInfo {
 
         // Post to the Plex sign_in xml link
         try {
-            grabPlexAuthToken = Jsoup.connect("https://plex.tv/users/sign_in.xml?X-Plex-Client-Identifier=" + randomUUID)
+            grabPlexAuthToken = Jsoup.connect("https://plex.tv/users/sign_in.xml?X-Plex-Client-Identifier=1")
                     .data("user[login]", plexLogin)
                     .data("user[password]", plexPassword)
-                    .userAgent("Mozilla")
+                    .followRedirects(false)
                     .parser(Parser.xmlParser())
                     .post();
-
-            System.out.println(grabPlexAuthToken);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -147,11 +146,57 @@ public class FetchPlexInfo {
         // Parse the returned XML to find the authentication-token value
         Elements authToken;
         if (grabPlexAuthToken != null) {
-            authToken = grabPlexAuthToken.getElementsByTag("user");
-            System.out.println(authToken.attr("authentication-token"));
+            authToken = grabPlexAuthToken.getElementsByTag("authentication-token");
+            setPlexAuthToken(authToken.text());
         } else {
             System.out.println("Could not find the user tag");
         }
+
+        userSelectsWhichServer();
+
+    }
+
+    private void userSelectsWhichServer() {
+        Scanner input = new Scanner(System.in);
+
+        Document listOfPlexServers = null;
+
+        try {
+            listOfPlexServers = Jsoup.connect("https://plex.tv/api/resources?X-Plex-Token=" + getPlexAuthToken()).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Elements serverNames = null;
+        if (listOfPlexServers != null) {
+            serverNames = listOfPlexServers.getElementsByTag("Device");
+
+            // Print out a list of all of the users servers
+            for (int i = 0; i < serverNames.size(); i++) {
+                System.out.println((i + 1) + ". " + serverNames.get(i).attr("name"));
+            }
+        }
+
+        // Dynamic input based on the output of the server list
+        while (true) {
+            try {
+                System.out.println("Select which of the servers above is the one you would like to use.");
+                int serverNum = input.nextInt();
+
+                if (serverNum > (serverNames.size() + 1)) {
+                    System.out.println("Please enter in a valid option");
+                } else {
+                    // TODO: Grab the IP address and the port num from the selected server and assign them to the class variables
+                    System.out.println(serverNames.get(serverNum - 1).attr("name"));
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println("Please enter in a valid option.");
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("Please enter in a valid option.");
+            }
+        }
+
+
 
     }
 
