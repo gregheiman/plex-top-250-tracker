@@ -24,15 +24,12 @@ public class GrabAllMovieNamesInPlex {
     //TODO: Create a logging system that tracks what URL's were used, what movies we already have, and what movies we
     // need to get
     private URL plexBaseURL;
-    private String plexIP;
-    private String plexPort;
-    private String plexLibraryNum;
-    private String plexAuthToken;
     private ArrayList<String> listOfNeededMovies;
     private FetchPlexInfo plexInfo;
 
-    public GrabAllMovieNamesInPlex() {
+    public GrabAllMovieNamesInPlex(FetchPlexInfo plexInfo) {
         listOfNeededMovies = new ArrayList<String>();
+        this.plexInfo = plexInfo;
     }
 
     public ArrayList<String> getListOfNeededMovies() {
@@ -47,7 +44,10 @@ public class GrabAllMovieNamesInPlex {
         this.listOfNeededMovies = listOfNeededMovies;
     }
 
-    public void setBasePlexURL() {
+    /**
+     *  Set the plexBaseURL based on the information gathered by FetchPlexInfo.java
+     */
+    public void setPlexBaseURL() {
         try {
             plexBaseURL = new URL("http://" + plexInfo.getPlexIP() + ":" + plexInfo.getPlexPort()
                     + "/library/sections/" + plexInfo.getPlexLibraryNum() + "/all?X-Plex-Token="

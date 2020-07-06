@@ -5,15 +5,15 @@ import java.util.Scanner;
 public class PlexTop250Tracker {
     public static void main(String[] args) {
         ScrapeIMDBMovieNames IMDBScraper = new ScrapeIMDBMovieNames();
-        GrabAllMovieNamesInPlex PlexAPIHitter = new GrabAllMovieNamesInPlex();
         WriteMovieTitlesToExcel ExcelSheet = new WriteMovieTitlesToExcel();
         EmailExcelToUser emailExcelToUser = new EmailExcelToUser(ExcelSheet);
         FetchPlexInfo plexInfoFetcher = new FetchPlexInfo();
 
         decideMethodOfFetchingPlexInfo(plexInfoFetcher);
 
+        GrabAllMovieNamesInPlex PlexAPIHitter = new GrabAllMovieNamesInPlex(plexInfoFetcher);
         // Create the Plex URL
-        PlexAPIHitter.setBasePlexURL();
+        PlexAPIHitter.setPlexBaseURL();
         // Crosscheck the IMDB list with the Plex library
         PlexAPIHitter.createNewPlexURLWithMovieTitle(IMDBScraper.getMovieTitles());
         // Print out the movies that are missing from the Plex library
@@ -27,20 +27,27 @@ public class PlexTop250Tracker {
 
     private static void decideMethodOfFetchingPlexInfo(FetchPlexInfo plexInfoFetcher) {
         Scanner input = new Scanner(System.in);
-        System.out.println("How would you like to fetch Plex data?");
-        System.out.println("1. Automatically");
-        System.out.println("2. Manually");
-        String answer = input.nextLine();
+        boolean run = true;
 
-        switch(answer) {
-            case "1":
-               plexInfoFetcher.automaticallyFetchPlexInfo();
-               break;
-            case "2":
-                plexInfoFetcher.manuallyFetchPlexInfo();
-                break;
-            default:
-                System.out.println("Please enter in a valid option");
+        while (run) {
+            System.out.println("How would you like to fetch Plex data?");
+            System.out.println("1. Automatically");
+            System.out.println("2. Manually");
+            String answer = input.nextLine();
+
+                switch (answer) {
+                    case "1":
+                        plexInfoFetcher.automaticallyFetchPlexInfo();
+                        run = false;
+                        break;
+                    case "2":
+                        plexInfoFetcher.manuallyFetchPlexInfo();
+                        run = false;
+                        break;
+                    default:
+                        System.out.println("Please select a valid option");
+                }
+
         }
     }
 }
