@@ -4,14 +4,18 @@ import java.util.Scanner;
 
 public class PlexTop250Tracker {
     public static void main(String[] args) {
+        // Create base versions of all the needed classes
         ScrapeIMDBMovieNames IMDBScraper = new ScrapeIMDBMovieNames();
         WriteMovieTitlesToExcel ExcelSheet = new WriteMovieTitlesToExcel();
         EmailExcelToUser emailExcelToUser = new EmailExcelToUser(ExcelSheet);
         FetchPlexInfo plexInfoFetcher = new FetchPlexInfo();
 
+        // Let the user decide wether they want to fetch their Plex info manually or automatically
         decideMethodOfFetchingPlexInfo(plexInfoFetcher);
 
+        // Create a GrabAllMovieNamesInPlex with the newly fetch Plex info
         GrabAllMovieNamesInPlex PlexAPIHitter = new GrabAllMovieNamesInPlex(plexInfoFetcher);
+
         // Create the Plex URL
         PlexAPIHitter.setPlexBaseURL();
         // Crosscheck the IMDB list with the Plex library

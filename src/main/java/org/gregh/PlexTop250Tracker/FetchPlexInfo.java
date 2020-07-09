@@ -3,16 +3,17 @@ package org.gregh.PlexTop250Tracker;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.net.NoRouteToHostException;
-import java.net.URL;
 import java.util.Scanner;
-import java.util.UUID;
 
+/**
+ * Class to fetch the needed info to run the program from the user, either automatically or manually.
+ * @author Greg Heiman
+ */
 public class FetchPlexInfo {
     private String plexIPAddress;
     private String plexPortNum;
@@ -120,6 +121,57 @@ public class FetchPlexInfo {
         return libraryNum.matches(pattern);
     }
 
+
+    /**
+     * If the user prefers to enter in all of the needed information manually or the automatic system doesn't work
+     */
+    public void manuallyFetchPlexInfo() {
+        Scanner input = new Scanner(System.in);
+
+        // Take in the user's Plex IP address
+        while (true) {
+            try {
+                System.out.println("What is the IP address of your local Plex server?");
+                setPlexIPAddress(input.nextLine());
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Please enter in a valid IP address");
+            }
+        }
+
+        // Take in the user's Plex port number
+        while (true) {
+            try {
+                System.out.println("What is the port number that your local Plex server runs on?");
+                setPlexPortNumber(input.nextLine());
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Please enter in a valid port number");
+            }
+        }
+
+        // Take in the user's Plex library
+        while (true) {
+            try {
+                System.out.println("What is the key of the library in which you store movies?");
+                setPlexLibraryNum(input.nextLine());
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Please enter in a valid library number");
+            }
+        }
+
+        while (true) {
+            try {
+                System.out.println("What is the auth token for your local Plex server?");
+                setPlexAuthToken(input.nextLine());
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Please enter in a valid Plex auth token");
+            }
+        }
+    }
+
     public void automaticallyFetchPlexInfo() {
         // Take in the users Plex login info
         Scanner input = new Scanner(System.in);
@@ -156,19 +208,22 @@ public class FetchPlexInfo {
             System.out.println("Could not find the user tag");
         }
 
-        // User selects which server to use as the IP address and Port num
-        userSelectsWhichServer();
+        // Select the server number from the list of servers
+        int selectedServer = userSelectsWhichServer(connectToServerList());
+        // Grab the connection tag from the unfiltered xml as this contains the IP address and port number
+        Elements connections = connectToServerList().getElementsByTag("Connection");
+        // Set the IP address and port number
+        setPlexIPAddress(grabServerIPAddress(connections, selectedServer));
+        setPlexPortNumber(grabServerPortAddress(connections, selectedServer));
         // User selects which library to use
         userSelectsWhichLibrary();
-
     }
 
     /**
-     * User goes through their set up Plex servers and selects which one to use
+     * Hit the API endpoint that lists the devices serving as servers for Plex
+     * @return - The unfiltered xml from hitting the api
      */
-    private void userSelectsWhichServer() {
-        Scanner input = new Scanner(System.in);
-
+    private Document connectToServerList() {
         Document listOfPlexServers = null;
 
         try {
@@ -178,7 +233,18 @@ public class FetchPlexInfo {
             e.printStackTrace();
         }
 
-        Elements serverNames = null;
+        return listOfPlexServers;
+    }
+
+    /**
+     * User selects which server they would like to use from the list provided by the Plex API
+     * @param listOfPlexServers - the unfiltered xml from hitting the Plex API for server devices
+     * @return - the selected server from the list
+     */
+    private int userSelectsWhichServer(Document listOfPlexServers) {
+        Scanner input = new Scanner(System.in);
+        int selectedServer;
+        Elements serverNames = new Elements();
 
         // Dynamic input based on the output of the server list
         while (true) {
@@ -190,34 +256,19 @@ public class FetchPlexInfo {
                 for (int i = 0; i < serverNames.size(); i++) {
                     System.out.println((i + 1) + ". " + serverNames.get(i).attr("name"));
                 }
+            } else {
+                System.out.println("The program was unable to find any servers connected to the specified account.");
             }
 
             try {
                 System.out.println("Select which of the servers above is the one you would like to use.");
-                int serverNum = input.nextInt();
+                selectedServer = input.nextInt();
 
-                if (serverNum > (serverNames.size() + 1)) {
+                if (selectedServer > (serverNames.size() + 1)) {
                     System.out.println("Please enter in a valid option");
                 } else {
-                    System.out.println(serverNames.get(serverNum - 1).attr("name"));
-
-                    Elements connections = null;
-
-                    // Create a list of all the connection tags
-                    if (listOfPlexServers != null) {
-                        connections = listOfPlexServers.getElementsByTag("Connection");
-                    } else {
-                        System.out.println("The list of serves is null");
-                    }
-
-                    // Find the appropriate connection tag and assign the ip address and port number from that tag
-                    if (connections != null) {
-                        setPlexIPAddress(connections.get(serverNum - 1).attr("address"));
-                        setPlexPortNumber(connections.get(serverNum - 1).attr("port"));
-                        break;
-                    } else {
-                        System.out.println("Unable to get a list of the connection tag");
-                    }
+                    System.out.println(serverNames.get(selectedServer - 1).attr("name"));
+                    return selectedServer;
                 }
             } catch (IllegalArgumentException e) {
                 System.out.println("Please enter in a valid option.");
@@ -225,9 +276,44 @@ public class FetchPlexInfo {
                 System.out.println("Please enter in a valid option.");
             }
         }
+    }
 
+    /**
+     * Grabs the IP address from the selected server
+     * @param connections - Filtered part of the xml that contains the IP address for the selected server
+     * @param serverNum - The number of the selected server in the list
+     * @return - The IP address in String format
+     */
+    private String grabServerIPAddress(Elements connections, int serverNum) {
+        String ipAddress = "";
 
+        if (connections != null) {
+            ipAddress = connections.get(serverNum - 1).attr("address");
+            System.out.println("The IP address for the server is " + ipAddress);
+        } else {
+            System.out.println("Unable to get a list of the connection tag");
+        }
 
+        return ipAddress;
+    }
+
+    /**
+     * Grabs the port number from the selected server
+     * @param connections - Filtered part of the xml that contains the port number for the selected server
+     * @param serverNum - The number of the selected server in the list
+     * @return - The port number in String format
+     */
+    private String grabServerPortAddress(Elements connections, int serverNum) {
+        String portNum= "";
+
+        if (connections != null) {
+            portNum = connections.get(serverNum - 1).attr("port");
+            System.out.println("The port number for the server is: " + portNum);
+        } else {
+            System.out.println("Unable to get a list of the connection tag");
+        }
+
+        return portNum;
     }
 
     /**
@@ -278,56 +364,6 @@ public class FetchPlexInfo {
                 } catch (IndexOutOfBoundsException e) {
                     System.out.println("Please enter in a valid option.");
                 }
-            }
-        }
-    }
-
-    /**
-     * If the user prefers to enter in all of the needed information manually or the automatic system doesn't work
-     */
-    public void manuallyFetchPlexInfo() {
-        Scanner input = new Scanner(System.in);
-
-        // Take in the user's Plex IP address
-        while (true) {
-            try {
-                System.out.println("What is the IP address of your local Plex server?");
-                setPlexIPAddress(input.nextLine());
-                break;
-            } catch (IllegalArgumentException e) {
-                System.out.println("Please enter in a valid IP address");
-            }
-        }
-
-        // Take in the user's Plex port number
-        while (true) {
-            try {
-                System.out.println("What is the port number that your local Plex server runs on?");
-                setPlexPortNumber(input.nextLine());
-                break;
-            } catch (IllegalArgumentException e) {
-                System.out.println("Please enter in a valid port number");
-            }
-        }
-
-        // Take in the user's Plex library
-        while (true) {
-            try {
-                System.out.println("What is the key of the library in which you store movies?");
-                setPlexLibraryNum(input.nextLine());
-                break;
-            } catch (IllegalArgumentException e) {
-                System.out.println("Please enter in a valid library number");
-            }
-        }
-
-        while (true) {
-            try {
-                System.out.println("What is the auth token for your local Plex server?");
-                setPlexAuthToken(input.nextLine());
-                break;
-            } catch (IllegalArgumentException e) {
-                System.out.println("Please enter in a valid Plex auth token");
             }
         }
     }
