@@ -1,5 +1,6 @@
 package org.gregh.PlexTop250Tracker;
 
+import com.sun.mail.iap.ConnectionException;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -7,6 +8,7 @@ import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.util.Scanner;
 
@@ -208,29 +210,73 @@ public class FetchPlexInfo {
             System.out.println("Could not find the user tag");
         }
 
-        // Select the server number from the list of servers
-        int selectedServer = userSelectsWhichServer(connectToServerList());
-        // Grab the connection tag from the unfiltered xml as this contains the IP address and port number
-        Elements connections = connectToServerList().getElementsByTag("Connection");
-        // Set the IP address and port number
-        setPlexIPAddress(grabServerIPAddress(connections, selectedServer));
-        setPlexPortNumber(grabServerPortAddress(connections, selectedServer));
-        // User selects which library to use
-        userSelectsWhichLibrary();
+        while (true) {
+            int selectedServer = 0;
+            Elements connections = new Elements();
+
+            try {
+                // Select the server number from the list of servers
+                selectedServer = userSelectsWhichServer(connectToServerList());
+            } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+                System.out.println("Please enter in a valid option.");
+            } catch (IOException e) {
+                System.out.println("There was an error. Please try again.");
+            }
+
+            try {
+                // Grab the connection tag from the unfiltered xml as this contains the IP address and port number
+                connections = connectToServerList().getElementsByTag("Connection");
+            } catch (IOException e) {
+                System.out.println("There was a problem fetching the list of Plex servers using the information provided");
+            }
+
+            try {
+                // Set the IP address and port number
+                setPlexIPAddress(grabServerIPAddress(connections, selectedServer));
+            } catch (Exception e) {
+                System.out.println("There was an error fetching the IP address of the chosen server. Please select a new" +
+                        " server.");
+            }
+            try {
+                // Set the IP address and port number
+                setPlexPortNumber(grabServerPortAddress(connections, selectedServer));
+            } catch (Exception e) {
+                System.out.println("There was an error fetching the IP address of the chosen server. Please select a new" +
+                        " server.");
+            }
+
+            try {
+                // User selects which library to use
+                userSelectsWhichLibrary();
+                // User must select a library in order for the program to work
+                break;
+            } catch (NoRouteToHostException e) {
+                System.out.println("The program was unable to find a valid route to the selected host. Please select" +
+                        " a different host or fix any network related problems.");
+            } catch (ConnectException e) {
+                System.out.println("The program was unable to connect to the specified server. Please select " +
+                        " a different server.");
+            } catch (IOException e) {
+                System.out.println("There was an IO error in fetching the libraries of the server that you selected." +
+                        " Please select a different server.");
+            } catch (Exception e) {
+                System.out.println("An error occurred fetching the libraries for that server please select a different " +
+                        " server.");
+            }
+        }
     }
 
     /**
      * Hit the API endpoint that lists the devices serving as servers for Plex
      * @return - The unfiltered xml from hitting the api
      */
-    private Document connectToServerList() {
+    private Document connectToServerList() throws IOException {
         Document listOfPlexServers = null;
 
         try {
             listOfPlexServers = Jsoup.connect("https://plex.tv/api/resources?X-Plex-Token=" + getPlexAuthToken()).get();
         } catch (IOException e) {
-            System.out.println("There was a problem fetching the list of Plex servers using the information provided");
-            e.printStackTrace();
+            throw new IOException();
         }
 
         return listOfPlexServers;
@@ -271,9 +317,9 @@ public class FetchPlexInfo {
                     return selectedServer;
                 }
             } catch (IllegalArgumentException e) {
-                System.out.println("Please enter in a valid option.");
+                throw new IllegalArgumentException();
             } catch (IndexOutOfBoundsException e) {
-                System.out.println("Please enter in a valid option.");
+                throw new IndexOutOfBoundsException();
             }
         }
     }
@@ -319,7 +365,7 @@ public class FetchPlexInfo {
     /**
      * User goes through the selected server's libraries and selects which one to use
      */
-    private void userSelectsWhichLibrary() {
+    private void userSelectsWhichLibrary() throws Exception {
         Scanner input = new Scanner(System.in);
 
         Document listOfPlexLibraries = null;
@@ -328,10 +374,13 @@ public class FetchPlexInfo {
             listOfPlexLibraries = Jsoup.connect("http://" + getPlexIP() + ":" + getPlexPort() + "/library/sections" +
                     "?X-Plex-Token=" + getPlexAuthToken()).get();
         } catch (NoRouteToHostException e) {
-            System.out.println("The program was unable to find a valid route to the selected host. Please select" +
-                    " a different host or fix any network related problems.");
+            throw new NoRouteToHostException();
+        } catch (ConnectException e) {
+            throw new ConnectException();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IOException();
+        } catch (Exception e) {
+           throw new Exception();
         }
 
         Elements libraryNames = null;
