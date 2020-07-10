@@ -210,7 +210,9 @@ public class FetchPlexInfo {
             System.out.println("Could not find the user tag");
         }
 
+        // User selects which server they want to use and which library in that server they want to use
         while (true) {
+            // If any of these fail it prompts the user to select a different server
             int selectedServer = 0;
             Elements connections = new Elements();
 
@@ -220,14 +222,18 @@ public class FetchPlexInfo {
             } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
                 System.out.println("Please enter in a valid option.");
             } catch (IOException e) {
-                System.out.println("There was an error. Please try again.");
+                System.out.println("There was an IO error in selecting which server to use. Please try again.");
+            } catch (Exception e) {
+                System.out.println("There was an error in selecting which server to use. Please try again.");
             }
 
             try {
                 // Grab the connection tag from the unfiltered xml as this contains the IP address and port number
                 connections = connectToServerList().getElementsByTag("Connection");
             } catch (IOException e) {
-                System.out.println("There was a problem fetching the list of Plex servers using the information provided");
+                System.out.println("There was an IO error fetching the list of Plex servers using the information provided");
+            } catch (Exception e) {
+                System.out.println("There was an error in fetching the list of Plex servers.");
             }
 
             try {
@@ -237,6 +243,7 @@ public class FetchPlexInfo {
                 System.out.println("There was an error fetching the IP address of the chosen server. Please select a new" +
                         " server.");
             }
+
             try {
                 // Set the IP address and port number
                 setPlexPortNumber(grabServerPortAddress(connections, selectedServer));
@@ -247,7 +254,7 @@ public class FetchPlexInfo {
 
             try {
                 // User selects which library to use
-                userSelectsWhichLibrary();
+                setPlexLibraryNum(userSelectsWhichLibrary(connectToSelectedServer()));
                 // User must select a library in order for the program to work
                 break;
             } catch (NoRouteToHostException e) {
@@ -363,11 +370,11 @@ public class FetchPlexInfo {
     }
 
     /**
-     * User goes through the selected server's libraries and selects which one to use
+     * User connects to the newly selected server and fetches a list of the libraries that server contains
+     * @return - The document containing unfiltered XML of all the libraries inside the server
+     * @throws Exception - Catch any exception that the method may throw
      */
-    private void userSelectsWhichLibrary() throws Exception {
-        Scanner input = new Scanner(System.in);
-
+    private Document connectToSelectedServer() throws Exception {
         Document listOfPlexLibraries = null;
 
         try {
@@ -380,9 +387,20 @@ public class FetchPlexInfo {
         } catch (IOException e) {
             throw new IOException();
         } catch (Exception e) {
-           throw new Exception();
+            throw new Exception();
         }
 
+        return listOfPlexLibraries;
+    }
+
+    /**
+     * User selects which library they would like to use from a list provided by the XML from connectToSelectedServer()
+     * @param listOfPlexLibraries - Unfiltered XML containing information about the libraries inside of the server
+     * @return - The number of the library the user would like to use
+     */
+    private String userSelectsWhichLibrary(Document listOfPlexLibraries) {
+        Scanner input = new Scanner(System.in);
+        String libraryNumber = "";
         Elements libraryNames = null;
 
         if (listOfPlexLibraries != null) {
@@ -405,7 +423,7 @@ public class FetchPlexInfo {
                         System.out.println(libraryNames.get(libraryNum - 1).attr("title"));
 
                         // Find the appropriate library and grab the key from the attributes
-                        setPlexLibraryNum(libraryNames.get(libraryNum - 1).attr("key"));
+                        libraryNumber = libraryNames.get(libraryNum - 1).attr("key");
                         break;
                     }
                 } catch (IllegalArgumentException e) {
@@ -415,5 +433,7 @@ public class FetchPlexInfo {
                 }
             }
         }
+
+        return libraryNumber;
     }
 }
