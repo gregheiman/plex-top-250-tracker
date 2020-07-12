@@ -9,3 +9,4 @@ APIKeys.txt
 *.settings/
 neededMovies.txt
 *.xlsx
+*logs/

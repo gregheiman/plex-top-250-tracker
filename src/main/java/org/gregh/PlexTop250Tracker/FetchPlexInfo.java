@@ -3,21 +3,44 @@ package org.gregh.PlexTop250Tracker;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.NoRouteToHostException;
-import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.Scanner;
-import java.util.UUID;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FetchPlexInfo {
     private String plexIPAddress;
     private String plexPortNum;
     private String plexLibraryNum;
     private String plexAuthToken;
+    private final Logger logger = Logger.getLogger("FetchPlexInfo Logger");
+
+    public FetchPlexInfo() {
+        try {
+            // Check that the logs folder exits and if not create it
+            if (!new File("./logs/").exists()) {
+                new File("./logs/").mkdir();
+            }
+
+            // Add a file handler to logger in order to have the logs written to a file
+            FileHandler handler = new FileHandler("./logs/" + LocalDateTime.now() + ".log");
+            handler.setLevel(Level.ALL);
+            logger.addHandler(handler);
+        } catch (SecurityException e) {
+            System.out.println("There was a security exception in initializing the logger.");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("There was an IO errer in initializing the logger.");
+            e.printStackTrace();
+        }
+    }
 
     public String getPlexIP() {
         return plexIPAddress;
@@ -142,6 +165,10 @@ public class FetchPlexInfo {
                 break;
             } catch (HttpStatusException e) {
                 System.out.println("The program was unable to access Plex with the information that you entered in.");
+
+                logger.log(Level.WARNING, "The program was unable to access Plex with the information that the " +
+                        "user entered in." + "\nThe information the user entered in was as follows: " + "\nPlex Login: " +
+                        plexLogin + "\nPlex Password: " + plexPassword);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -175,7 +202,9 @@ public class FetchPlexInfo {
             listOfPlexServers = Jsoup.connect("https://plex.tv/api/resources?X-Plex-Token=" + getPlexAuthToken()).get();
         } catch (IOException e) {
             System.out.println("There was a problem fetching the list of Plex servers using the information provided");
-            e.printStackTrace();
+
+            logger.severe("The program was unable to fetch the list of servers for the user  from the following" +
+                    " URL: " + "\nPlex URL: https://plex.tv/api/resources?X-Plex-Token=" + getPlexAuthToken());
         }
 
         Elements serverNames = null;
