@@ -4,10 +4,9 @@ import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 /**
@@ -16,7 +15,7 @@ import java.util.ArrayList;
  */
 public class WriteMovieTitlesToExcel {
     private XSSFWorkbook workbook;
-    private FileOutputStream fileOut;
+    private OutputStream fileOut;
     private String fileOutName;
 
     public WriteMovieTitlesToExcel() {
@@ -31,11 +30,11 @@ public class WriteMovieTitlesToExcel {
         this.workbook = workbook;
     }
 
-    public FileOutputStream getFileOut() {
+    public OutputStream getFileOut() {
        return fileOut;
     }
 
-    public void setFileOut(FileOutputStream fileOut) {
+    public void setFileOut(OutputStream fileOut) {
         this.fileOut = fileOut;
     }
 
@@ -121,20 +120,24 @@ public class WriteMovieTitlesToExcel {
      */
     public void writeMissingMoviesToSpreadsheet(ArrayList<String> missingMovieNames) {
         // Needed in order to allow for the easy creation of hyperlinks
-        CreationHelper createHelper = workbook.getCreationHelper();
+        CreationHelper createHelper = getWorkbook().getCreationHelper();
 
         // Set the name of the spreadsheet
         try {
-            setFileOutName(LocalDateTime.now() + "-Missing Movies.xlsx");
-            setFileOut(new FileOutputStream(getFileOutName()));
+            // Default LocalDateTime.now() has a colon in it causing problems on Windows
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
+
+            setFileOutName(LocalDateTime.now().format(formatter) + "-MissingMovies.xlsx");
+            setFileOut(new FileOutputStream(new File("./" + getFileOutName())));
+            //setFileOut(new FileOutputStream("./" + getFileOutName()));
         } catch (FileNotFoundException e) {
             System.out.println("There was an issue finding or creating the needed spreadsheet file.");
             e.printStackTrace();
         }
 
         // Create a spreadsheet inside of workbook and set the header row information
-        Sheet spreadsheet = workbook.createSheet("Missing Movies");
-        setHeaderRow(workbook, spreadsheet);
+        Sheet spreadsheet = getWorkbook().createSheet("Missing Movies");
+        setHeaderRow(getWorkbook(), spreadsheet);
 
         // Go through the entire missingMovieNames list and add the names to the first column
         for (int i = 0; i < missingMovieNames.size(); i++) {
@@ -148,7 +151,7 @@ public class WriteMovieTitlesToExcel {
             // Set the value of that A column to be the name of the movie that is missing
             movieCell.setCellValue(missingMovieNames.get(i));
             // Set the cell style for the movie titles
-            movieCell.setCellStyle(setSpreadsheetCellStyle(workbook));
+            movieCell.setCellStyle(setSpreadsheetCellStyle(getWorkbook()));
 
             // Set the library links in the B column
             Cell linkCell = row.createCell(1);
@@ -159,16 +162,17 @@ public class WriteMovieTitlesToExcel {
             link.setAddress(libraryURLs.createLibraryURL());
             linkCell.setHyperlink(link);
             // Set the style for the hyperlink cells
-            linkCell.setCellStyle(setHyperlinkStyle(workbook));
+            linkCell.setCellStyle(setHyperlinkStyle(getWorkbook()));
         }
 
         // Autosize the name column after all the movies have been added
         spreadsheet.autoSizeColumn(0);
         spreadsheet.autoSizeColumn(1);
+        spreadsheet.autoSizeColumn(2);
 
         try {
             // Write the FileOutputStream to the workbook
-            workbook.write(fileOut);
+            getWorkbook().write(getFileOut());
         } catch (IOException e) {
             System.out.println("There was a problem writing to the workbook.");
             e.printStackTrace();
@@ -176,8 +180,8 @@ public class WriteMovieTitlesToExcel {
 
         try {
             // Close FileOutputStream and workbook when finished
-            fileOut.close();
-            workbook.close();
+            getFileOut().close();
+            getWorkbook().close();
         } catch (IOException e) {
             System.out.println("There was a problem closing the workbook or the FileOutputStream");
             e.printStackTrace();

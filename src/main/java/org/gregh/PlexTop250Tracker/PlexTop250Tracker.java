@@ -7,10 +7,9 @@ public class PlexTop250Tracker {
         // Create base versions of all the needed classes
         ScrapeIMDBMovieNames IMDBScraper = new ScrapeIMDBMovieNames();
         WriteMovieTitlesToExcel ExcelSheet = new WriteMovieTitlesToExcel();
-        EmailExcelToUser emailExcelToUser = new EmailExcelToUser(ExcelSheet);
         FetchPlexInfo plexInfoFetcher = new FetchPlexInfo();
 
-        // Let the user decide wether they want to fetch their Plex info manually or automatically
+        // Let the user decide whether they want to fetch their Plex info manually or automatically
         decideMethodOfFetchingPlexInfo(plexInfoFetcher);
 
         // Create a GrabAllMovieNamesInPlex with the newly fetch Plex info
@@ -20,13 +19,10 @@ public class PlexTop250Tracker {
         PlexAPIHitter.setPlexBaseURL();
         // Crosscheck the IMDB list with the Plex library
         PlexAPIHitter.createNewPlexURLWithMovieTitle(IMDBScraper.getMovieTitles());
-        // Print out the movies that are missing from the Plex library
-        PlexAPIHitter.sendNeededMoviesToFile(PlexAPIHitter.getListOfNeededMovies());
-        // Add the movies to an Excel spreadsheet
-        ExcelSheet.writeMissingMoviesToSpreadsheet(PlexAPIHitter.getListOfNeededMovies());
-
-        // Send the newly created excel sheet to the users chosen email address
-        emailExcelToUser.askUserForSenderEmail();
+        // Have the user decide if they want a text file
+        decideWhetherToWriteMoviesToTextFile(PlexAPIHitter);
+        // Have the user decide if they want to send the missing movies to an excel file
+        decideWhetherToWriteMoviesToExcelFile(ExcelSheet, PlexAPIHitter);
     }
 
     private static void decideMethodOfFetchingPlexInfo(FetchPlexInfo plexInfoFetcher) {
@@ -52,6 +48,62 @@ public class PlexTop250Tracker {
                         System.out.println("Please select a valid option");
                 }
 
+        }
+    }
+
+    private static void decideWhetherToWriteMoviesToTextFile(GrabAllMovieNamesInPlex PlexAPIHitter) {
+        Scanner input = new Scanner(System.in);
+        boolean run = true;
+
+        while (run) {
+            System.out.println("Would you like to print a list of the needed movies to a text file?");
+            System.out.println("1. Yes");
+            System.out.println("2. No");
+            int answer = input.nextInt();
+
+            switch (answer) {
+                case 1:
+                    // Print out the movies that are missing from the Plex library
+                   PlexAPIHitter.sendNeededMoviesToFile(PlexAPIHitter.getListOfNeededMovies());
+                   run = false;
+                   break;
+                case 2:
+                    System.out.println("The program will not write the names of missing movies to a text file.\n");
+                    run = false;
+                    break;
+                default:
+                    System.out.println("Please enter in a valid option");
+            }
+        }
+    }
+
+    private static void decideWhetherToWriteMoviesToExcelFile(WriteMovieTitlesToExcel ExcelSheet,
+                                                              GrabAllMovieNamesInPlex PlexAPIHitter) {
+        EmailExcelToUser emailExcelToUser = new EmailExcelToUser(ExcelSheet);
+        Scanner input = new Scanner(System.in);
+        boolean run = true;
+
+        while (run) {
+            System.out.println("Would you like to print a list of the needed movies to an Excel file?");
+            System.out.println("1. Yes");
+            System.out.println("2. No");
+            int answer = input.nextInt();
+
+            switch (answer) {
+                case 1:
+                    // Print out the movies that are missing from the Plex library
+                    ExcelSheet.writeMissingMoviesToSpreadsheet(PlexAPIHitter.getListOfNeededMovies());
+                    // Send the newly created excel sheet to the users chosen email address
+                    emailExcelToUser.askUserForSenderEmail();
+                    run = false;
+                    break;
+                case 2:
+                    System.out.println("The program will not write the names of missing movies to an Excel file.\n");
+                    run = false;
+                    break;
+                default:
+                    System.out.println("Please enter in a valid option");
+            }
         }
     }
 }

@@ -21,13 +21,14 @@ public class GetLibraryURLs {
     }
 
     public String createLibraryURL() {
+        System.out.println("Creating the library URL for the following movie " + getMovieName());
         // Base URL for MCPL's REST based catalog. Shows only DVD's
         String baseURL = "https://mymcpl.bibliocommons.com/v2/search?f_FORMAT=DVD&query=";
         // Filters down the results to only show those that match the title
         String afterMovieNameBaseURL = "&searchType=title";
 
         // Changes spaces to be +, which is what the RESTful system MCPL uses for spaces
-        String movieNameWithNoSpaces = movieName.replace(" ", "+");
+        String movieNameWithNoSpaces = getMovieName().replace(" ", "+");
 
         // Add all the pieces together to form a valid URL
         String finalURL = (baseURL + movieNameWithNoSpaces + afterMovieNameBaseURL);
@@ -40,6 +41,7 @@ public class GetLibraryURLs {
     }
 
     private boolean verifyURLExistence(String urlToTest) {
+        System.out.println("Verifying the following library URL: " + urlToTest);
         // Does not verify that the movie exists simply verifies that the link is not dead
         try {
             URL url = new URL(urlToTest);
