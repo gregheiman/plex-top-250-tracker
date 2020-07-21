@@ -4,3 +4,9 @@
 *target/
 APIKeys.txt
 *.idea/
+.project
+.classpath
+*.settings/
+neededMovies.txt
+*.xlsx
+*logs/
