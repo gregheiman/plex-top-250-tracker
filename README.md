@@ -1,6 +1,6 @@
 ## Plex Top 250 Tracker
 
-This program is designed to track what movies on the IMDB Top 250 list 
+This program is designed to track what movies on the [IMDB Top 250 list](https://www.imdb.com/chart/top) 
 are missing from your Plex library. The program requires the use of the Plex
 API which is undocumented and not very user-friendly. For more information on the
 use of the API I recommend [this page](https://github.com/Arcanemagus/plex-api/wiki) 
