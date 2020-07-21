@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -35,7 +36,8 @@ public class FetchPlexInfo {
             }
 
             // Add a file handler to logger in order to have the logs written to a file
-            FileHandler handler = new FileHandler("./logs/" + LocalDateTime.now() + ".log");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
+            FileHandler handler = new FileHandler("./logs/" + LocalDateTime.now().format(formatter) + ".log");
             handler.setLevel(Level.ALL);
             logger.addHandler(handler);
         } catch (SecurityException e) {

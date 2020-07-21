@@ -25,6 +25,7 @@ public class PlexTop250Tracker {
         decideWhetherToWriteMoviesToExcelFile(ExcelSheet, PlexAPIHitter);
     }
 
+
     private static void decideMethodOfFetchingPlexInfo(FetchPlexInfo plexInfoFetcher) {
         Scanner input = new Scanner(System.in);
         boolean run = true;
@@ -79,7 +80,6 @@ public class PlexTop250Tracker {
 
     private static void decideWhetherToWriteMoviesToExcelFile(WriteMovieTitlesToExcel ExcelSheet,
                                                               GrabAllMovieNamesInPlex PlexAPIHitter) {
-        EmailExcelToUser emailExcelToUser = new EmailExcelToUser(ExcelSheet);
         Scanner input = new Scanner(System.in);
         boolean run = true;
 
@@ -93,8 +93,8 @@ public class PlexTop250Tracker {
                 case 1:
                     // Print out the movies that are missing from the Plex library
                     ExcelSheet.writeMissingMoviesToSpreadsheet(PlexAPIHitter.getListOfNeededMovies());
-                    // Send the newly created excel sheet to the users chosen email address
-                    emailExcelToUser.askUserForSenderEmail();
+                    // Have user decide whether to send excel sheet through email
+                    decideWhetherToSendEmail(ExcelSheet);
                     run = false;
                     break;
                 case 2:
@@ -105,5 +105,32 @@ public class PlexTop250Tracker {
                     System.out.println("Please enter in a valid option");
             }
         }
+    }
+
+    private static void decideWhetherToSendEmail(WriteMovieTitlesToExcel excelSheet) {
+        EmailExcelToUser emailExcelToUser = new EmailExcelToUser(excelSheet);
+        Scanner input = new Scanner(System.in);
+        boolean run = true;
+
+        while (run) {
+            System.out.println("Would you like to email the newly created excel file to an email through Gmail?");
+            System.out.println("1. Yes");
+            System.out.println("2. No");
+            String answer = input.nextLine();
+
+            switch (answer) {
+                case "1":
+                    emailExcelToUser.askUserForSenderEmail();
+                    run = false;
+                    break;
+                case "2":
+                    run = false;
+                    break;
+                default:
+                    System.out.println("Please select a valid option");
+            }
+
+        }
+
     }
 }

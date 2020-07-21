@@ -8,6 +8,7 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Writes the missing movie names to an excel file
@@ -122,6 +123,9 @@ public class WriteMovieTitlesToExcel {
         // Needed in order to allow for the easy creation of hyperlinks
         CreationHelper createHelper = getWorkbook().getCreationHelper();
 
+        // If user wants MCPL URLs in the spreadsheet
+        boolean userWantsLibraryURLs = decideWhetherToPutLibraryURLsInExcelSheet();
+
         // Set the name of the spreadsheet
         try {
             // Default LocalDateTime.now() has a colon in it causing problems on Windows
@@ -141,7 +145,6 @@ public class WriteMovieTitlesToExcel {
 
         // Go through the entire missingMovieNames list and add the names to the first column
         for (int i = 0; i < missingMovieNames.size(); i++) {
-            GetLibraryURLs libraryURLs = new GetLibraryURLs(missingMovieNames.get(i));
             // Create a new row for each movie
             // Needs to be + 1 in order to allow for the date at the top
             Row row = spreadsheet.createRow(i + 1);
@@ -153,16 +156,20 @@ public class WriteMovieTitlesToExcel {
             // Set the cell style for the movie titles
             movieCell.setCellStyle(setSpreadsheetCellStyle(getWorkbook()));
 
-            // Set the library links in the B column
-            Cell linkCell = row.createCell(1);
-            // Set the value of the cell to the raw link
-            linkCell.setCellValue(libraryURLs.createLibraryURL());
-            // Create hyperlinks inside of the cells
-            Hyperlink link = createHelper.createHyperlink(HyperlinkType.URL);
-            link.setAddress(libraryURLs.createLibraryURL());
-            linkCell.setHyperlink(link);
-            // Set the style for the hyperlink cells
-            linkCell.setCellStyle(setHyperlinkStyle(getWorkbook()));
+            // If user wants MCPL URLs in the spreadsheet
+            if (userWantsLibraryURLs) {
+                GetLibraryURLs libraryURLs = new GetLibraryURLs(missingMovieNames.get(i));
+                // Set the library links in the B column
+                Cell linkCell = row.createCell(1);
+                // Set the value of the cell to the raw link
+                linkCell.setCellValue(libraryURLs.createLibraryURL());
+                // Create hyperlinks inside of the cells
+                Hyperlink link = createHelper.createHyperlink(HyperlinkType.URL);
+                link.setAddress(libraryURLs.createLibraryURL());
+                linkCell.setHyperlink(link);
+                // Set the style for the hyperlink cells
+                linkCell.setCellStyle(setHyperlinkStyle(getWorkbook()));
+            }
         }
 
         // Autosize the name column after all the movies have been added
@@ -186,5 +193,28 @@ public class WriteMovieTitlesToExcel {
             System.out.println("There was a problem closing the workbook or the FileOutputStream");
             e.printStackTrace();
         }
+    }
+
+    private boolean decideWhetherToPutLibraryURLsInExcelSheet() {
+       Scanner input = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("Would you like to put MCPL URLs inside of the spreadsheet?");
+            System.out.println("1. Yes");
+            System.out.println("2. No");
+            int answer = input.nextInt();
+
+            switch (answer) {
+                case 1:
+                    System.out.println("\nThe spreadsheet will print library URLs.");
+                    return true;
+                case 2:
+                    System.out.println("\nThe spreadsheet will not print library URLs");
+                    return false;
+                default:
+                    System.out.println("Please enter in a valid option");
+            }
+        }
+
     }
 }
