@@ -199,8 +199,6 @@ public class FetchPlexInfo {
                 System.out.println("Please enter in a valid Plex auth token");
             }
         }
-
-        input.close();
     }
 
     public void automaticallyFetchPlexInfo() {
@@ -228,7 +226,7 @@ public class FetchPlexInfo {
 
                 logger.log(Level.WARNING, "The program was unable to access Plex with the information that the " +
                         "user entered in." + "\nThe information the user entered in was as follows: " + "\nPlex Login: " +
-                        plexLogin + "\nPlex Password: " + plexPassword);
+                        plexLogin + "\nPlex Password: " + plexPassword + "\n");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -281,7 +279,7 @@ public class FetchPlexInfo {
                 // Set the IP address and port number
                 setPlexPortNumber(grabServerPortAddress(connections, selectedServer));
             } catch (Exception e) {
-                System.out.println("There was an error fetching the IP address of the chosen server. Please select a new" +
+                System.out.println("There was an error fetching the port number of the chosen server. Please select a new" +
                         " server.");
             }
 
@@ -299,13 +297,15 @@ public class FetchPlexInfo {
             } catch (IOException e) {
                 System.out.println("There was an IO error in fetching the libraries of the server that you selected." +
                         " Please select a different server.");
+                logger.severe("The program ran into an IO error when fetching the libraries of the following server." +
+                        "\nServer IP: " + getPlexIP() + "\nServer Port: " + getPlexPort() + "\nLibrary Num: " + getPlexLibraryNum() + "\n");
             } catch (Exception e) {
                 System.out.println("An error occurred fetching the libraries for that server please select a different " +
                         " server.");
+                logger.severe("The program ran into an issue grabbing the libraries for the selected server." + 
+                        "\nServer IP: " + getPlexIP() + "\nServer Port: " + getPlexPort() + "\nLibrary Num: " + getPlexLibraryNum() + "\n");
             }
         }
-
-        input.close();
     }
 
     /**
@@ -321,7 +321,7 @@ public class FetchPlexInfo {
             System.out.println("There was a problem fetching the list of Plex servers using the information provided");
 
             logger.severe("The program was unable to fetch the list of servers for the user  from the following" +
-                    " URL: " + "\nPlex URL: https://plex.tv/api/resources?X-Plex-Token=" + getPlexAuthToken());
+                    " URL: " + "\nPlex URL: https://plex.tv/api/resources?X-Plex-Token=" + getPlexAuthToken() + "\n");
         }
 
         return listOfPlexServers;
@@ -359,7 +359,6 @@ public class FetchPlexInfo {
                     System.out.println("Please enter in a valid option");
                 } else {
                     System.out.println(serverNames.get(selectedServer - 1).attr("name"));
-                    input.close();
                     return selectedServer;
                 }
             } catch (IllegalArgumentException e) {
@@ -473,7 +472,6 @@ public class FetchPlexInfo {
             }
         }
         
-        input.close();
         return libraryNumber;
     }
 }
