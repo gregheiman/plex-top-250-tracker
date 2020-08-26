@@ -199,6 +199,8 @@ public class FetchPlexInfo {
                 System.out.println("Please enter in a valid Plex auth token");
             }
         }
+
+        input.close();
     }
 
     public void automaticallyFetchPlexInfo() {
@@ -302,6 +304,8 @@ public class FetchPlexInfo {
                         " server.");
             }
         }
+
+        input.close();
     }
 
     /**
@@ -355,6 +359,7 @@ public class FetchPlexInfo {
                     System.out.println("Please enter in a valid option");
                 } else {
                     System.out.println(serverNames.get(selectedServer - 1).attr("name"));
+                    input.close();
                     return selectedServer;
                 }
             } catch (IllegalArgumentException e) {
@@ -467,7 +472,8 @@ public class FetchPlexInfo {
                 }
             }
         }
-
+        
+        input.close();
         return libraryNumber;
     }
 }

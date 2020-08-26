@@ -166,7 +166,7 @@ public class GrabAllMovieNamesInPlex {
                 neededMoviesFile.println("\nThis list was written on: " + LocalDateTime.now());
                 // Close the PrintWriter
                 neededMoviesFile.close();
-                // Log the successful writting of the neededMovies.txt file
+                // Log the successful writing of the neededMovies.txt file
                 System.out.println("Successfully printed to the neededMovies.txt file on: " + LocalDateTime.now());
             }
         } catch (FileNotFoundException e) {

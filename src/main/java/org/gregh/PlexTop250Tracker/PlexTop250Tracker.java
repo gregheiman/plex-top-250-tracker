@@ -50,6 +50,7 @@ public class PlexTop250Tracker {
                 }
 
         }
+        input.close();
     }
 
     private static void decideWhetherToWriteMoviesToTextFile(GrabAllMovieNamesInPlex PlexAPIHitter) {
@@ -76,6 +77,7 @@ public class PlexTop250Tracker {
                     System.out.println("Please enter in a valid option");
             }
         }
+        input.close();
     }
 
     private static void decideWhetherToWriteMoviesToExcelFile(WriteMovieTitlesToExcel ExcelSheet,
@@ -105,6 +107,7 @@ public class PlexTop250Tracker {
                     System.out.println("Please enter in a valid option");
             }
         }
+        input.close();
     }
 
     private static void decideWhetherToSendEmail(WriteMovieTitlesToExcel excelSheet) {
@@ -116,14 +119,14 @@ public class PlexTop250Tracker {
             System.out.println("Would you like to email the newly created excel file to an email through Gmail?");
             System.out.println("1. Yes");
             System.out.println("2. No");
-            String answer = input.nextLine();
+            int answer = input.nextInt();
 
             switch (answer) {
-                case "1":
+                case 1:
                     emailExcelToUser.askUserForSenderEmail();
                     run = false;
                     break;
-                case "2":
+                case 2:
                     run = false;
                     break;
                 default:
@@ -131,6 +134,6 @@ public class PlexTop250Tracker {
             }
 
         }
-
+        input.close();
     }
 }

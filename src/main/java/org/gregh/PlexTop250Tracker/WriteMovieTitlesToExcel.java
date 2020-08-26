@@ -207,9 +207,11 @@ public class WriteMovieTitlesToExcel {
             switch (answer) {
                 case 1:
                     System.out.println("\nThe spreadsheet will print library URLs.");
+                    input.close();
                     return true;
                 case 2:
                     System.out.println("\nThe spreadsheet will not print library URLs");
+                    input.close();
                     return false;
                 default:
                     System.out.println("Please enter in a valid option");

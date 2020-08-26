@@ -44,6 +44,7 @@ public class EmailExcelToUser {
 
         System.out.println("What email would you like to send the movie list to?");
         setDestinationEmailAddress(input.nextLine());
+        input.close();
 
         sendEmail(getDestinationEmailAddress(), writeMovieTitlesToExcel.getFileOutName());
     }
@@ -90,7 +91,8 @@ public class EmailExcelToUser {
                 return new PasswordAuthentication(username, password);
             }
         });
-
+        
+        input.close();
         return session;
     }
 
