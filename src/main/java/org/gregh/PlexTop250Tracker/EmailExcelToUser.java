@@ -1,26 +1,38 @@
 package org.gregh.PlexTop250Tracker;
 
-import org.subethamail.smtp.helper.SimpleMessageListenerAdapter;
-import org.subethamail.smtp.server.SMTPServer;
-import org.subethamail.wiser.Wiser;
-
 import java.time.LocalDateTime;
 import java.util.Properties;
 import java.util.Scanner;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.mail.*;
-import javax.mail.internet.*;
+import javax.mail.AuthenticationFailedException;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 public class EmailExcelToUser {
     private String destinationEmailAddress;
     private String senderEmailAddress;
     private WriteMovieTitlesToExcel writeMovieTitlesToExcel;
+    private Logger logger;
 
     public EmailExcelToUser(WriteMovieTitlesToExcel writeMovieTitlesToExcel) {
         this.senderEmailAddress = "plexTop250Tracker@javamail.com";
         this.writeMovieTitlesToExcel = writeMovieTitlesToExcel;
+        this.logger = LogManager.getLogger(EmailExcelToUser.class);
     }
 
     public void setDestinationEmailAddress(String destinationEmailAddress) {
@@ -47,27 +59,6 @@ public class EmailExcelToUser {
         input.close();
 
         sendEmail(getDestinationEmailAddress(), writeMovieTitlesToExcel.getFileOutName());
-    }
-
-    private void startLocalSMTPServer() {
-        SimpleMessageListenerImpl simpleMessageListener = new SimpleMessageListenerImpl();
-        SMTPServer smtpServer = new SMTPServer(new SimpleMessageListenerAdapter(simpleMessageListener));
-        smtpServer.setPort(25000);
-        smtpServer.start();
-
-        Wiser wiser = new Wiser();
-        wiser.setPort(25001);
-        wiser.start();
-    }
-
-    private Session connectToLocalSMTPServer() {
-        Properties properties = System.getProperties();
-        properties.setProperty("mail.smtp.host", "localhost");
-        properties.setProperty("mail.smtp.port", "25000");
-
-        Session session = Session.getInstance(properties);
-
-        return session;
     }
 
     private Session connectToGmailSMTPServer() {
@@ -130,10 +121,16 @@ public class EmailExcelToUser {
             System.out.println("Message sent successfully");
 
         } catch (AddressException e) {
+            System.out.println("There was an error with an address");
             e.printStackTrace();
         } catch (AuthenticationFailedException e) {
+            System.out.println("There was an error with authentication.");
             e.printStackTrace();
         } catch (MessagingException e) {
+            System.out.println("There was an error with messaging");
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("There was an error with sending the email. Please check the log");
             e.printStackTrace();
         }
     }
