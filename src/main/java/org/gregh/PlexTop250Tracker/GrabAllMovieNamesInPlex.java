@@ -140,10 +140,12 @@ public class GrabAllMovieNamesInPlex {
 
         // Assess whether the title attribute inside of the Video tag equals the title of the movie from IMDB
         if (titleVerify.attr("title").equals(titleOfMovie)) {
-            System.out.println("The program was able to successfully retrieve the following movie: " + finalPlexURL);
+            // Output in green
+            System.out.println((char)27 + "[32m" + titleOfMovie + " was successfully matched.");
             return true;
         } else {
-            System.out.println("The title didn't match for the following title: " + titleOfMovie);
+            // Output in red
+            System.out.println((char)27 + "[31m" + titleOfMovie + " was not successfully matched.");
             return false;
         }
     }

@@ -53,7 +53,7 @@ public class EmailExcelToUser {
 
     public void askUserForSenderEmail() {
         Scanner input = new Scanner(System.in);
-
+        
         System.out.println("What email would you like to send the movie list to?");
         setDestinationEmailAddress(input.nextLine());
         input.close();
@@ -90,7 +90,7 @@ public class EmailExcelToUser {
     private void sendEmail(String destinationEmailAddress, String fileName) {
         // Create a connection to the Gmail SMTP server
         Session session = connectToGmailSMTPServer();
-
+        
         try {
             // Create a new email message
             MimeMessage emailMessage = new MimeMessage(session);

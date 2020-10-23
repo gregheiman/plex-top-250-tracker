@@ -10,3 +10,4 @@ APIKeys.txt
 neededMovies.txt
 *.xlsx
 *logs/
+*.log

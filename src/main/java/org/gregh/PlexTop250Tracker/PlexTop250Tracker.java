@@ -61,15 +61,15 @@ public class PlexTop250Tracker {
             System.out.println("Would you like to print a list of the needed movies to a text file?");
             System.out.println("1. Yes");
             System.out.println("2. No");
-            int answer = input.nextInt();
+            String answer = input.nextLine();
 
             switch (answer) {
-                case 1:
+                case "1":
                     // Print out the movies that are missing from the Plex library
                    PlexAPIHitter.sendNeededMoviesToFile(PlexAPIHitter.getListOfNeededMovies());
                    run = false;
                    break;
-                case 2:
+                case "2":
                     System.out.println("The program will not write the names of missing movies to a text file.\n");
                     run = false;
                     break;
@@ -89,17 +89,17 @@ public class PlexTop250Tracker {
             System.out.println("Would you like to print a list of the needed movies to an Excel file?");
             System.out.println("1. Yes");
             System.out.println("2. No");
-            int answer = input.nextInt();
+            String answer = input.nextLine();
 
             switch (answer) {
-                case 1:
+                case "1":
                     // Print out the movies that are missing from the Plex library
                     ExcelSheet.writeMissingMoviesToSpreadsheet(PlexAPIHitter.getListOfNeededMovies());
                     // Have user decide whether to send excel sheet through email
                     decideWhetherToSendEmail(ExcelSheet);
                     run = false;
                     break;
-                case 2:
+                case "2":
                     System.out.println("The program will not write the names of missing movies to an Excel file.\n");
                     run = false;
                     break;
@@ -119,14 +119,14 @@ public class PlexTop250Tracker {
             System.out.println("Would you like to email the newly created excel file to an email through Gmail?");
             System.out.println("1. Yes");
             System.out.println("2. No");
-            int answer = input.nextInt();
+            String answer = input.nextLine();
 
             switch (answer) {
-                case 1:
+                case "1":
                     emailExcelToUser.askUserForSenderEmail();
                     run = false;
                     break;
-                case 2:
+                case "2":
                     run = false;
                     break;
                 default:
