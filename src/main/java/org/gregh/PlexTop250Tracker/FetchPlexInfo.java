@@ -1,21 +1,16 @@
 package org.gregh.PlexTop250Tracker;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.maven.plugin.logging.Log;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
-import java.util.logging.FileHandler;
 
 import org.apache.logging.log4j.Logger;
 /**

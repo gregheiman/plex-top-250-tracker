@@ -132,7 +132,7 @@ public class WriteMovieTitlesToExcel {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
 
             setFileOutName(LocalDateTime.now().format(formatter) + "-MissingMovies.xlsx");
-            setFileOut(new FileOutputStream(new File(GrabAllMovieNamesInPlex.createOutDirectory(), getFileOutName())));
+            setFileOut(new FileOutputStream(new File(GrabAllMovieNamesInPlex.verifyExistenceOfOrCreateOutDirectory(), getFileOutName())));
             //setFileOut(new FileOutputStream("./" + getFileOutName()));
         } catch (FileNotFoundException e) {
             System.out.println("There was an issue finding or creating the needed spreadsheet file.");
