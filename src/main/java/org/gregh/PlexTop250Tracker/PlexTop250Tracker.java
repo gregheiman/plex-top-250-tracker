@@ -142,7 +142,6 @@ public class PlexTop250Tracker {
      * Allows user to decided whether or not they would like to send the spreadsheet to an email address.
      */
     private static void decideWhetherToSendEmail() {
-        EmailExcelToUser emailExcelToUser = new EmailExcelToUser(ExcelSheet);
         boolean run = true;
 
         while (run) {
@@ -154,6 +153,7 @@ public class PlexTop250Tracker {
             switch (answer) {
                 case "1":
                     logger.log(Level.INFO, "User chose to send email containing missing movies.");
+                    EmailExcelToUser emailExcelToUser = new EmailExcelToUser(ExcelSheet);
                     emailExcelToUser.askUserForSenderEmail();
                     run = false;
                     break;

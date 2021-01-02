@@ -11,3 +11,4 @@ neededMovies.txt
 *.xlsx
 *logs/
 *.log
+*out/

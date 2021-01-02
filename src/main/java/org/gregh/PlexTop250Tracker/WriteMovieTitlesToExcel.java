@@ -132,7 +132,7 @@ public class WriteMovieTitlesToExcel {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
 
             setFileOutName(LocalDateTime.now().format(formatter) + "-MissingMovies.xlsx");
-            setFileOut(new FileOutputStream(new File("./" + getFileOutName())));
+            setFileOut(new FileOutputStream(new File(GrabAllMovieNamesInPlex.createOutDirectory(), getFileOutName())));
             //setFileOut(new FileOutputStream("./" + getFileOutName()));
         } catch (FileNotFoundException e) {
             System.out.println("There was an issue finding or creating the needed spreadsheet file.");
@@ -207,11 +207,9 @@ public class WriteMovieTitlesToExcel {
             switch (answer) {
                 case 1:
                     System.out.println("\nThe spreadsheet will print library URLs.");
-                    input.close();
                     return true;
                 case 2:
                     System.out.println("\nThe spreadsheet will not print library URLs");
-                    input.close();
                     return false;
                 default:
                     System.out.println("Please enter in a valid option");

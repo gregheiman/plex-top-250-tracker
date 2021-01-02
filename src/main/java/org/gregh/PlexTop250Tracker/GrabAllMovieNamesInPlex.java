@@ -4,11 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -140,12 +136,12 @@ public class GrabAllMovieNamesInPlex {
 
         // Assess whether the title attribute inside of the Video tag equals the title of the movie from IMDB
         if (titleVerify.attr("title").equals(titleOfMovie)) {
-            // Output in green
-            System.out.println((char)27 + "[32m" + titleOfMovie + " was successfully matched.");
+            // Output in green and reset
+            System.out.println((char)27 + "[32m" + titleOfMovie + " was successfully matched." + (char)27 + "[0m");
             return true;
         } else {
-            // Output in red
-            System.out.println((char)27 + "[31m" + titleOfMovie + " was not successfully matched.");
+            // Output in red and reset
+            System.out.println((char)27 + "[31m" + titleOfMovie + " was not successfully matched." + (char)27 + "[0m");
             return false;
         }
     }
@@ -155,8 +151,23 @@ public class GrabAllMovieNamesInPlex {
      * @param neededMovies - An arraylist that contains the names of all the missing movies
      */
     public void sendNeededMoviesToFile(ArrayList<String> neededMovies) {
+        // create the text file for the missing movies
+        File neededMovieFile = new File(createOutDirectory(), "neededMovies.txt");
         try {
-            PrintWriter neededMoviesFile = new PrintWriter("neededMovies.txt");
+            if (neededMovieFile.createNewFile()) {
+               // print to logger that the file was created successfully
+            } else {
+               // print to logger that the file was not created successfully
+            }
+        } catch (IOException e) {
+            // log the IOException error
+            System.out.println("There was an error in creating the text file");
+            e.printStackTrace();
+        }
+
+        // print the list of movies from the array list to the neededMovieFile text file
+        try {
+            PrintWriter neededMoviesFile = new PrintWriter(neededMovieFile);
 
             try {
                 // Write the name of every movie onto the neededMovies.txt file
@@ -175,5 +186,25 @@ public class GrabAllMovieNamesInPlex {
             System.out.println("Could not find the neededMovies.txt file");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Create or verify the existence of the ./out directory for the text files and excel files to go
+     * @return the out directory
+     */
+    public static File createOutDirectory() {
+        File outDirectory = new File("./out");
+        try {
+            if (outDirectory.exists() || outDirectory.mkdir()) {
+                // log the successful creation of the directory
+            } else {
+                // log any problems that occur
+            }
+        } catch (Exception e) {
+            System.out.println("There was an error in creating the output directory");
+            e.printStackTrace();
+        }
+
+        return outDirectory;
     }
 }
