@@ -1,6 +1,7 @@
 package org.gregh.PlexTop250Tracker;
 
 import org.apache.logging.log4j.LogManager;
+import org.apache.maven.plugin.logging.Log;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -26,10 +27,9 @@ public class FetchPlexInfo {
     private String plexPortNum;
     private String plexLibraryNum;
     private String plexAuthToken;
-    private Logger logger;
+    static Logger logger = LogManager.getLogger(FetchPlexInfo.class);
 
     public FetchPlexInfo() {
-        this.logger = LogManager.getLogger(FetchPlexInfo.class);
     }
 
     public String getPlexIP() {

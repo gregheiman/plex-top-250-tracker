@@ -56,13 +56,13 @@ public class PlexTop250Tracker {
 
             switch (answer) {
                 case "1":
-                    plexInfoFetcher.automaticallyFetchPlexInfo();
                     logger.log(Level.INFO, "User chose automatic fetching of Plex data.");
+                    plexInfoFetcher.automaticallyFetchPlexInfo();
                     run = false;
                     break;
                 case "2":
-                    plexInfoFetcher.manuallyFetchPlexInfo();
                     logger.log(Level.INFO, "User chose manual fetching of Plex data.");
+                    plexInfoFetcher.manuallyFetchPlexInfo();
                     run = false;
                     break;
                 default:
@@ -88,14 +88,14 @@ public class PlexTop250Tracker {
 
             switch (answer) {
                 case "1":
+                    logger.log(Level.INFO, "User chose to send missing movies to a text file.");
                     // Print out the movies that are missing from the Plex library
                    plexAPIHitter.sendNeededMoviesToFile(plexAPIHitter.getListOfNeededMovies());
-                   logger.log(Level.INFO, "User chose to send missing movies to a text file.");
                    run = false;
                    break;
                 case "2":
-                    System.out.println("The program will not write the names of missing movies to a text file.\n");
                     logger.log(Level.INFO, "User chose not to send missing movies to a text file.");
+                    System.out.println("The program will not write the names of missing movies to a text file.\n");
                     run = false;
                     break;
                 default:
@@ -120,16 +120,16 @@ public class PlexTop250Tracker {
 
             switch (answer) {
                 case "1":
+                    logger.log(Level.INFO, "User chose to write missing movies to a spreadsheet.");
                     // Print out the movies that are missing from the Plex library
                     ExcelSheet.writeMissingMoviesToSpreadsheet(plexAPIHitter.getListOfNeededMovies());
                     // Have user decide whether to send excel sheet through email
                     decideWhetherToSendEmail();
-                    logger.log(Level.INFO, "User chose to write missing movies to a spreadsheet.");
                     run = false;
                     break;
                 case "2":
-                    System.out.println("The program will not write the names of missing movies to an Excel file.\n");
                     logger.log(Level.INFO, "User chose not to write missing movies to a spreadsheet.");
+                    System.out.println("The program will not write the names of missing movies to an Excel file.\n");
                     run = false;
                     break;
                 default:
@@ -153,8 +153,8 @@ public class PlexTop250Tracker {
 
             switch (answer) {
                 case "1":
-                    emailExcelToUser.askUserForSenderEmail();
                     logger.log(Level.INFO, "User chose to send email containing missing movies.");
+                    emailExcelToUser.askUserForSenderEmail();
                     run = false;
                     break;
                 case "2":
