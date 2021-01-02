@@ -1,6 +1,6 @@
 ## Plex Top 250 Tracker
 
-This program is designed to track what movies on the IMDB Top 250 list 
+This program is designed to track what movies on the [IMDB Top 250 list](https://www.imdb.com/chart/top)
 are missing from your Plex library. The program requires the use of the Plex
 API which is undocumented and not very user-friendly. For more information on the
 use of the API I recommend [this page](https://github.com/Arcanemagus/plex-api/wiki) 
@@ -39,8 +39,16 @@ to install the Maven packages:
     mvn clean compile exec:java
     ```
    
-10. If you would like to email the automatically created excel sheet to yourself or someone else
+* If you would like to email the automatically created excel sheet to yourself or someone else
 you must have a Gmail account and either allow less secure sign ins through the security panel, or
 if you have 2-Factor authentication you need to create an app password to use with this program.
-    * If you would not like to use Gmail or don't want to email the spreadsheet anywhere just end the program when you get to that point.
+
+## Technologies Used
+[JSoup](https://jsoup.org)\
+[Apache Log4j 2](https://logging.apache.org/log4j/2.x/)\
+[Apache Maven](https://maven.apache.org)\
+[Plex API](https://github.com/Arcanemagus/plex-api/wiki)\
+[Apache POI](https://poi.apache.org)
+
+
 
