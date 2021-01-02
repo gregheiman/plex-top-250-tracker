@@ -17,7 +17,6 @@ import java.util.Scanner;
 import java.util.logging.FileHandler;
 
 import org.apache.logging.log4j.Logger;
-
 /**
  * Class to fetch the needed info to run the program from the user, either automatically or manually.
  * @author Greg Heiman
