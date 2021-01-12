@@ -1,10 +1,24 @@
 package org.gregh.PlexTop250Tracker;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.common.usermodel.HyperlinkType;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Hyperlink;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -18,6 +32,7 @@ public class WriteMovieTitlesToExcel {
     private XSSFWorkbook workbook;
     private OutputStream fileOut;
     private String fileOutName;
+    static Logger logger = LogManager.getLogger(WriteMovieTitlesToExcel.class);
 
     public WriteMovieTitlesToExcel() {
         workbook = new XSSFWorkbook();
@@ -61,6 +76,7 @@ public class WriteMovieTitlesToExcel {
         CellStyle spreadsheetCellStyle = workbook.createCellStyle();
         spreadsheetCellStyle.setFont(spreadsheetFont);
 
+        logger.log(Level.DEBUG, "Cell Style was set.");
         return spreadsheetCellStyle;
     }
 
@@ -79,6 +95,7 @@ public class WriteMovieTitlesToExcel {
         CellStyle hyperlinkStyle = workbook.createCellStyle();
         hyperlinkStyle.setFont(hyperlinkFont);
 
+        logger.log(Level.DEBUG, "Hyperlink style was set.");
         return hyperlinkStyle;
     }
 
@@ -113,6 +130,8 @@ public class WriteMovieTitlesToExcel {
         Cell dateCell = headerRow.createCell(2);
         dateCell.setCellValue("This spreadsheet was created on: " + LocalDateTime.now());
         dateCell.setCellStyle(headerCellStyle);
+
+        logger.log(Level.DEBUG, "Header row was set");
     }
 
     /**
@@ -136,7 +155,8 @@ public class WriteMovieTitlesToExcel {
             //setFileOut(new FileOutputStream("./" + getFileOutName()));
         } catch (FileNotFoundException e) {
             System.out.println("There was an issue finding or creating the needed spreadsheet file.");
-            e.printStackTrace();
+
+            logger.log(Level.ERROR, "FileNotFoundException in setting the name of the spreadsheet file.");
         }
 
         // Create a spreadsheet inside of workbook and set the header row information
@@ -153,6 +173,9 @@ public class WriteMovieTitlesToExcel {
             Cell movieCell = row.createCell(0);
             // Set the value of that A column to be the name of the movie that is missing
             movieCell.setCellValue(missingMovieNames.get(i));
+
+            logger.log(Level.DEBUG, "Program set value of cell at row: " + row +
+                    " with movie: " + missingMovieNames.get(i));
             // Set the cell style for the movie titles
             movieCell.setCellStyle(setSpreadsheetCellStyle(getWorkbook()));
 
@@ -167,6 +190,9 @@ public class WriteMovieTitlesToExcel {
                 Hyperlink link = createHelper.createHyperlink(HyperlinkType.URL);
                 link.setAddress(libraryURLs.createLibraryURL());
                 linkCell.setHyperlink(link);
+
+                logger.log(Level.DEBUG, "Program set MCPL hyperlink for row: " + row +
+                        " and movie name: " + missingMovieNames.get(i) + " with the link: " + link);
                 // Set the style for the hyperlink cells
                 linkCell.setCellStyle(setHyperlinkStyle(getWorkbook()));
             }
@@ -182,7 +208,8 @@ public class WriteMovieTitlesToExcel {
             getWorkbook().write(getFileOut());
         } catch (IOException e) {
             System.out.println("There was a problem writing to the workbook.");
-            e.printStackTrace();
+
+            logger.log(Level.ERROR, "IOException when writing the spreadsheet to the .xlsx file.");
         }
 
         try {
@@ -191,7 +218,8 @@ public class WriteMovieTitlesToExcel {
             getWorkbook().close();
         } catch (IOException e) {
             System.out.println("There was a problem closing the workbook or the FileOutputStream");
-            e.printStackTrace();
+
+            logger.log(Level.ERROR, "IOException when closing the spreadsheet and .xlsx file.");
         }
     }
 
@@ -207,9 +235,11 @@ public class WriteMovieTitlesToExcel {
             switch (answer) {
                 case 1:
                     System.out.println("\nThe spreadsheet will print library URLs.");
+                    logger.log(Level.DEBUG, "User has chosen to print library URLs in spreadsheet.");
                     return true;
                 case 2:
                     System.out.println("\nThe spreadsheet will not print library URLs");
+                    logger.log(Level.DEBUG, "User has not chosen to print library URLs in spreadsheet.");
                     return false;
                 default:
                     System.out.println("Please enter in a valid option");

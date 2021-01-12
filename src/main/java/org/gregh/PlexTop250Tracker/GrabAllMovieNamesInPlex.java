@@ -7,7 +7,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -161,13 +166,13 @@ public class GrabAllMovieNamesInPlex {
 
         // Assess whether the title attribute inside of the Video tag equals the title of the movie from IMDB
         if (titleVerify.attr("title").equals(titleOfMovie)) {
-            logger.log(Level.DEBUG, "Program was able to verify " + titleOfMovie + " with Plex Server.");
+            logger.log(Level.INFO, "Program was able to verify " + titleOfMovie + " with Plex Server.");
 
             // Output in green and reset
             System.out.println((char)27 + "[32m" + titleOfMovie + " was successfully matched." + (char)27 + "[0m");
             return true;
         } else {
-            logger.log(Level.WARN, "Program was not able to verify " + titleOfMovie + " with Plex Server.");
+            logger.log(Level.INFO, "Program was not able to verify " + titleOfMovie + " with Plex Server.");
 
             // Output in red and reset
             System.out.println((char)27 + "[31m" + titleOfMovie + " was not successfully matched." + (char)27 + "[0m");
