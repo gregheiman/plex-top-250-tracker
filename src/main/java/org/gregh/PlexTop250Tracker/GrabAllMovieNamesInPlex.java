@@ -52,7 +52,7 @@ public class GrabAllMovieNamesInPlex {
      * @return - true if the movie is actually present in the Plex library - false
      *         if the movie is not present
      */
-    public boolean verifyTitleOfMovieWithPlex(String plexURLWithMovieName, String titleOfMovie) {
+    public boolean verifyMovieIsPresentInPlexLibrary(String plexURLWithMovieName, String titleOfMovie) {
         // Checks for the matching of the title field to make sure that the movie
         // actually exists in the Plex
         // Media Server

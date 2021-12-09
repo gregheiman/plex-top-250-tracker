@@ -26,7 +26,7 @@ public class PlexTop250Tracker {
         // Crosscheck the IMDB list with the Plex library. Add missing movies to list
         for (String movieTitle : IMDBScraper.getTop250MovieTitles()) {
             String plexUrl = PlexAPIHitter.createNewPlexURLWithMovieTitle(movieTitle);
-            if (!PlexAPIHitter.verifyTitleOfMovieWithPlex(plexUrl, movieTitle)) {
+            if (!PlexAPIHitter.verifyMovieIsPresentInPlexLibrary(plexUrl, movieTitle)) {
                 neededMovies.add(movieTitle);
             }
         }
