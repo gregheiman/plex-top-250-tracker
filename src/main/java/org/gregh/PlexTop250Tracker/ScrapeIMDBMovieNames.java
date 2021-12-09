@@ -15,26 +15,24 @@ import java.util.ArrayList;
  * @author Greg Heiman
  */
 public class ScrapeIMDBMovieNames {
-    private static ArrayList<String> movieTitlesWithSpaceIdentifiers = new ArrayList<String>();
-    private static ArrayList<String> movieTitlesWithSpaces = new ArrayList<String>();
+    private ArrayList<String> top250MovieTitles;
 
-    public ScrapeIMDBMovieNames() {
-       SetMovieTitlesArrayListsFromIMDB();
+    public ScrapeIMDBMovieNames() {}
+
+
+    public ArrayList<String> getTop250MovieTitles() {
+        return top250MovieTitles;
     }
 
-    public ArrayList<String> getMovieTitles() {
-        return movieTitlesWithSpaceIdentifiers;
-    }
-
-    public static ArrayList<String> getMovieTitlesWithSpaces() {
-        return movieTitlesWithSpaces;
+    public void setTop250MovieTitles(ArrayList<String> top250MovieTitles) {
+        this.top250MovieTitles = top250MovieTitles;
     }
 
     /**
      * Scrapes the IMDB top 250 web page and adds the names of the movies to an ArrayList that will be used for
      * creating Plex URL's to search through the Plex library.
      */
-    public static void SetMovieTitlesArrayListsFromIMDB() {
+    public void retrieveTop250MoviesFromIMDB() {
         Document IMDBTop250 = null;
 
         try {
@@ -53,11 +51,7 @@ public class ScrapeIMDBMovieNames {
             for (Element row : listOfMovies) {
                 // Add the movie names to the movieTitles arraylist
                 String finalMovieTitle = filterIMDBTitles(row.text());
-                // Actual movie titles that use the %20 space identifier for the URL
-                movieTitlesWithSpaceIdentifiers.add(finalMovieTitle);
-                // Needed to verify that the movie actually exits in the Plex library
-                movieTitlesWithSpaces.add(finalMovieTitle);
-
+                top250MovieTitles.add(finalMovieTitle);
             }
         } catch(Exception e) {
             System.out.println("An exception occured in fetching the titles of the movies");

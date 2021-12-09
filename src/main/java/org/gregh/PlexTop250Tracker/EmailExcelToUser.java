@@ -1,72 +1,40 @@
 package org.gregh.PlexTop250Tracker;
 
-import org.subethamail.smtp.helper.SimpleMessageListenerAdapter;
-import org.subethamail.smtp.server.SMTPServer;
-import org.subethamail.wiser.Wiser;
-
 import java.time.LocalDateTime;
 import java.util.Properties;
 import java.util.Scanner;
+
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.mail.*;
-import javax.mail.internet.*;
+import javax.mail.AuthenticationFailedException;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 public class EmailExcelToUser {
-    private String destinationEmailAddress;
     private String senderEmailAddress;
-    private WriteMovieTitlesToExcel writeMovieTitlesToExcel;
 
-    public EmailExcelToUser(WriteMovieTitlesToExcel writeMovieTitlesToExcel) {
-        this.senderEmailAddress = "plexTop250Tracker@javamail.com";
-        this.writeMovieTitlesToExcel = writeMovieTitlesToExcel;
-    }
-
-    public void setDestinationEmailAddress(String destinationEmailAddress) {
-        this.destinationEmailAddress = destinationEmailAddress;
-    }
-
-    public String getDestinationEmailAddress() {
-        return destinationEmailAddress;
+    public EmailExcelToUser(String senderEmailAddress) {
+        this.senderEmailAddress = senderEmailAddress;
     }
 
     public String getSenderEmailAddress() {
         return senderEmailAddress;
+
     }
 
     public void setSenderEmailAddress(String senderEmailAddress) {
         this.senderEmailAddress = senderEmailAddress;
-    }
-
-    public void askUserForSenderEmail() {
-        Scanner input = new Scanner(System.in);
-
-        System.out.println("What email would you like to send the movie list to?");
-        setDestinationEmailAddress(input.nextLine());
-
-        sendEmail(getDestinationEmailAddress(), writeMovieTitlesToExcel.getFileOutName());
-    }
-
-    private void startLocalSMTPServer() {
-        SimpleMessageListenerImpl simpleMessageListener = new SimpleMessageListenerImpl();
-        SMTPServer smtpServer = new SMTPServer(new SimpleMessageListenerAdapter(simpleMessageListener));
-        smtpServer.setPort(25000);
-        smtpServer.start();
-
-        Wiser wiser = new Wiser();
-        wiser.setPort(25001);
-        wiser.start();
-    }
-
-    private Session connectToLocalSMTPServer() {
-        Properties properties = System.getProperties();
-        properties.setProperty("mail.smtp.host", "localhost");
-        properties.setProperty("mail.smtp.port", "25000");
-
-        Session session = Session.getInstance(properties);
-
-        return session;
     }
 
     private Session connectToGmailSMTPServer() {
@@ -94,7 +62,12 @@ public class EmailExcelToUser {
         return session;
     }
 
-    private void sendEmail(String destinationEmailAddress, String fileName) {
+    public void sendEmailWithExcelSheetAttached(String fileName) {
+        Scanner input = new Scanner(System.in);
+
+        System.out.println("What email would you like to send the movie list to?");
+        String destinationEmailAddress = input.nextLine();
+
         // Create a connection to the Gmail SMTP server
         Session session = connectToGmailSMTPServer();
 
